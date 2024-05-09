@@ -1,0 +1,15 @@
+L'analisi del codice malware svela un comportamento dannoso che include due azioni principali: l'intercettazione dei clic del mouse e la copia del file malware nella cartella di avvio del sistema per garantire la persistenza. Questo malware adotta diverse tecniche per mascherare la sua presenza e rendere complicata la sua rimozione.
+
+Particolarmente rivelatore è l'utilizzo della funzione SetWindowsHook con il parametro WH_MOUSE nell'ultima riga di codice. Questa scelta indica che il malware non è un tradizionale keylogger, che registra le pressioni dei tasti sulla tastiera, ma piuttosto un mouse logger. Questo tipo di malware monitora e registra i movimenti e i clic del mouse dell'utente. La sua utilità malintenzionata può comprendere il furto di informazioni sensibili, il tracciamento dell'attività dell'utente e persino il prendere il controllo del computer.
+
+1)push eax, push ebx, push ecx: Queste istruzioni salvano i valori dei registri EAX, EBX ed ECX nello stack, un'area temporanea di memoria utilizzata durante l'esecuzione del programma.
+2)push WH_MOUSE: Qui viene spinto il valore di WH_MOUSE nello stack. Questa costante, definita da Windows, identifica l'hook del mouse.
+3)call SetWindowsHook(): Questa chiamata di funzione installa un hook nel sistema, specificando il tipo di hook da installare e la funzione di callback da eseguire quando si verifica l'evento. In questo caso, si sta probabilmente installando un hook per intercettare gli eventi del mouse.
+4)XOR ECX, ECX: Questa istruzione imposta il registro ECX a zero. L'operazione XOR tra ECX e se stesso genera sempre zero, probabilmente per azzerare il registro in modo da prepararlo per un nuovo utilizzo.
+5)movecx, [EDI]: Qui viene copiato il valore contenuto all'indirizzo puntato da EDI nel registro ECX. Il registro EDI probabilmente punta alla memoria allocata per memorizzare il percorso della cartella di avvio del sistema.
+6)movedx, [ESI]: Questa istruzione copia il valore contenuto nell'indirizzo puntato da ESI nel registro EDX. Il registro ESI probabilmente punta alla memoria allocata per memorizzare il percorso del file malware.
+7)push ecx, push edx: Queste istruzioni spingono i valori dei registri ECX ed EDX nello stack, probabilmente in preparazione per una chiamata di funzione successiva.
+8)Call CopyFile(): Infine, la funzione CopyFile() viene chiamata per copiare il file malware nella cartella di avvio del sistema, spostando così il malware e garantendo la sua persistenza nel sistema.
+
+
+L'analisi del codice rivela un approccio efficace del malware per ottenere persistenza nel sistema operativo. Copiandosi nella cartella di avvio, il malware assicura la sua esecuzione automatica ad ogni avvio del sistema, aumentando così le possibilità di raggiungere i suoi obiettivi dannosi. Oltre a questo meccanismo di persistenza, il codice mostra altri comportamenti dannosi, tra cui la registrazione dei movimenti del mouse e la crittografia dei file. Queste azioni indicano un'intenzione mirata a intercettare dati sensibili e compromettere l'integrità dei file dell'utente, mettendo a rischio la sicurezza e la privacy del sistema.
